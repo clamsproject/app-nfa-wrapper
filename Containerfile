@@ -39,7 +39,7 @@ RUN pip install Cython packaging
 RUN git clone https://github.com/NVIDIA/NeMo /opt/NeMo
 WORKDIR /opt/NeMo
 RUN git checkout ${REF:-'main'}
-RUN pip install nemo_toolkit['asr']
+RUN pip install ".[asr]"
 ################################################################################
 
 ################################################################################
