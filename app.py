@@ -17,6 +17,9 @@ from mmif import Mmif, AnnotationTypes, DocumentTypes
 # For an NLP tool we need to import the LAPPS vocabulary items
 from lapps.discriminators import Uri
 
+# imports for NeMo
+from align import main, AlignmentConfig, ASSFileConfig  # maybe don't need ASSFileConfig
+
 # global dict for model options - pending further changes
 MODEL_OPTIONS = {
     "fc_hybrid": "stt_en_fastconformer_hybrid_large_pc",
@@ -24,8 +27,6 @@ MODEL_OPTIONS = {
     "conformer": "stt_en_conformer_ctc_medium",
     "fc_ctc": "stt_en_fastconformer_ctc_large"
 }
-# default path for NeMo installation in container
-DEFAULT_NEMO_PATH = "/opt/NeMo"
 
 class NfaWrapper(ClamsApp):
 
@@ -73,23 +74,31 @@ class NfaWrapper(ClamsApp):
         # create a temporary directory to pass to align.py for output files
         tmpdir = tempfile.TemporaryDirectory()
 
-        # get path of align.py
-        NEMO_PATH = os.getenv('NEMO_PATH', DEFAULT_NEMO_PATH)
-        align_path = NEMO_PATH + "/tools/nemo_forced_aligner/align.py"
         # get model name based on user input
         model_name = parameters.get("model")
         if model_name not in MODEL_OPTIONS:
             raise ValueError("Unsupported model; note that this wrapper does not "
                              "support all NeMo models. See parameters specification in the appmetadata.")
         else:
-            model_name = "pretrained_name=" + MODEL_OPTIONS[model_name]
+            model_name = MODEL_OPTIONS[model_name]
         # get paths of temporary manifest and output directory
-        manifest_path = "manifest_filepath=" + manifest.name
-        output_dir = "output_dir=" + tmpdir.name
-        output_format = "save_output_file_formats=['ctm']"
+        manifest_path = manifest.name
+        output_dir = tmpdir.name
+        output_format = ['ctm']
         # call align.py with necessary arguments
-        args = ["python", align_path, model_name, manifest_path, output_dir, output_format]
-        pipe = subprocess.run(args)
+        alignment_config = AlignmentConfig(
+			pretrained_name=model_name,
+			manifest_filepath=manifest_path,
+			output_dir=output_dir,
+			audio_filepath_parts_in_utt_id=1,
+			batch_size=1,
+			use_local_attention=True,
+			additional_segment_grouping_separator="|",
+			# transcribe_device='cpu',
+			# viterbi_device='cpu',
+			save_output_file_formats=output_format,
+		)
+        main(alignment_config)
 
         # get file name for word-level CTM output
         resampled_name = resampled_path.split('/')[-1]

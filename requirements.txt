@@ -1,7 +1,11 @@
 # Make sure clams-python version is explicitly specified, at least the lower bound
+# NeMo is similarly finicky about the torch version
 clams-python>=1.3.2
 lapps
 ffmpeg-python
 torch==2.7.1
 soundfile
 omegaconf
+nemo-toolkit[asr]==2.0.0rc1
+numpy<2.0.0
+ipython

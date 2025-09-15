@@ -36,10 +36,6 @@ RUN apt install -y git
 RUN apt install -y build-essential libsndfile1 ffmpeg
 RUN pip install Cython packaging
 
-RUN git clone https://github.com/NVIDIA/NeMo /opt/NeMo
-WORKDIR /opt/NeMo
-RUN git checkout ${REF:-'main'}
-RUN pip install ".[asr]"
 ################################################################################
 
 ################################################################################
