@@ -46,7 +46,10 @@ class NfaWrapper(ClamsApp):
         Converts an audio or video file to 16kHz mono WAV format using ffmpeg-python.
         Returns the WAV data as bytes (in-memory, no output file).
         """
-        temp_wav = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
+        if input_path.lower().endswith('.wav'):
+            temp_wav = tempfile.NamedTemporaryFile(delete=False, suffix='.wav')
+        else:
+            temp_wav = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
         temp_wav.close()  # Close the file so ffmpeg can write to it
         ffmpeg.input(input_path).output(temp_wav.name, format='wav', ac=1, ar=16000).overwrite_output().run()
         return temp_wav.name  # Return the path to the temporary WAV file
