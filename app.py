@@ -16,6 +16,8 @@ from clams import ClamsApp, Restifier
 from mmif import Mmif, AnnotationTypes, DocumentTypes
 # For an NLP tool we need to import the LAPPS vocabulary items
 from lapps.discriminators import Uri
+# using this to get audio duration
+from moviepy import VideoFileClip
 
 # imports for NeMo
 from align import main, AlignmentConfig, ASSFileConfig  # maybe don't need ASSFileConfig
@@ -32,6 +34,7 @@ class NfaWrapper(ClamsApp):
 
     def __init__(self):
         super().__init__()
+        self.max_gpu_duration_sec = 30.0  # max audio duration for GPU processing
 
     def _appmetadata(self):
         # using metadata.py
@@ -81,6 +84,18 @@ class NfaWrapper(ClamsApp):
                              "support all NeMo models. See parameters specification in the appmetadata.")
         else:
             model_name = MODEL_OPTIONS[model_name]
+
+        # also get the duration time, we have to switch to CPU if over 30 seconds because of CUDA memory limits
+        clip = VideoFileClip(audio_path)
+        duration_sec = clip.duration
+        clip.close()
+        if duration_sec > self.max_gpu_duration_sec:
+            transcribe_device = 'cpu'
+            viterbi_device = 'cpu'
+        else:
+            transcribe_device = 'cuda'
+            viterbi_device = 'cuda'
+        
         # get paths of temporary manifest and output directory
         manifest_path = manifest.name
         output_dir = tmpdir.name
@@ -94,8 +109,8 @@ class NfaWrapper(ClamsApp):
 			batch_size=1,
 			use_local_attention=True,
 			additional_segment_grouping_separator="|",
-			# transcribe_device='cpu',
-			# viterbi_device='cpu',
+			transcribe_device=transcribe_device,
+			viterbi_device=viterbi_device,
 			save_output_file_formats=output_format,
 		)
         main(alignment_config)
