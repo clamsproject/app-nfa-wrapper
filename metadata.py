@@ -22,7 +22,13 @@ def appmetadata() -> AppMetadata:
     
     :return: AppMetadata object holding all necessary information.
     """
-    
+
+    nemo_version_file = pathlib.Path(__file__).parent / 'NEMO_VERSION'
+    try:
+        analyzer_version = nemo_version_file.read_text().strip()
+    except FileNotFoundError:
+        analyzer_version = 'main'
+
     metadata = AppMetadata(
         name="CLAMS NFA Wrapper",
         description="Wraps the [NVIDIA NeMo Forced Aligner tool](https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/tools/nemo_forced_aligner.html)"
@@ -31,7 +37,7 @@ def appmetadata() -> AppMetadata:
         app_license="Apache 2.0",
         identifier="nfa-wrapper",
         url="https://github.com/clamsproject/app-nfa-wrapper",
-        analyzer_version='1.20.0',
+        analyzer_version=analyzer_version,
         analyzer_license="Apache 2.0",
     )
 
