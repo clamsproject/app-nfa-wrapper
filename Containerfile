@@ -1,5 +1,5 @@
 # Use the same base image version as the clams-python python library version
-FROM ghcr.io/clamsproject/clams-python:1.3.2
+FROM ghcr.io/clamsproject/clams-python-ffmpeg-torch2:1.3.3
 # See https://github.com/orgs/clamsproject/packages?tab=packages&q=clams-python for more base images
 # IF you want to automatically publish this image to the clamsproject organization,
 # 1. you should have generated this template without --no-github-actions flag
@@ -36,10 +36,6 @@ RUN apt install -y git
 RUN apt install -y build-essential libsndfile1 ffmpeg
 RUN pip install Cython packaging
 
-RUN git clone https://github.com/NVIDIA/NeMo /opt/NeMo
-WORKDIR /opt/NeMo
-RUN git checkout ${REF:-'main'}
-RUN pip install nemo_toolkit['asr']
 ################################################################################
 
 ################################################################################

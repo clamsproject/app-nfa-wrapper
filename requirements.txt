@@ -1,4 +1,7 @@
 # Make sure clams-python version is explicitly specified, at least the lower bound
-clams-python>=1.3.2
-lapps
+clams-python==1.3.3
 ffmpeg-python
+nemo-toolkit[asr]==2.*
+torch==2.*
+soundfile
+omegaconf
