@@ -9,7 +9,6 @@ from mmif import DocumentTypes, AnnotationTypes
 
 from clams.app import ClamsApp
 from clams.appmetadata import AppMetadata
-from lapps.discriminators import Uri
 
 
 # DO NOT CHANGE the function name
@@ -31,9 +30,7 @@ def appmetadata() -> AppMetadata:
 
     metadata = AppMetadata(
         name="CLAMS NFA Wrapper",
-        description="Wraps the [NVIDIA NeMo Forced Aligner tool](https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/tools/nemo_forced_aligner.html)"
-                    "to temporally align transcribed text with its audio source. "
-                    "Requires a local [NeMo](https://github.com/NVIDIA/NeMo#installation) installation.",
+        description="Wraps the [NVIDIA NeMo Forced Aligner tool](https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/tools/nemo_forced_aligner.html) to temporally align transcribed text with its audio source. ",
         app_license="Apache 2.0",
         identifier="nfa-wrapper",
         url="https://github.com/clamsproject/app-nfa-wrapper",
@@ -47,8 +44,8 @@ def appmetadata() -> AppMetadata:
     in_txt.add_description('Text content transcribed from audio input with no existing annotations.')
 
     # Output Spec
-    out_tkn = metadata.add_output(Uri.TOKEN)
-    out_tkn.add_description('Token from original text split on whitespace. `word` property stores the string value '
+    out_tkn = metadata.add_output(AnnotationTypes.Token)
+    out_tkn.add_description('Token from original text split on whitespace. `text` property stores the string value '
                             'of the token. `start` and `end` properties indicate position of token in entire text. '
                             '`document` property identifies source text document.')
     out_tf = metadata.add_output(AnnotationTypes.TimeFrame, frameType='speech', timeUnit='milliseconds')
@@ -58,12 +55,10 @@ def appmetadata() -> AppMetadata:
     out_ali.add_description('Alignment between `Token` and `TimeFrame` annotations.')
 
     # Parameters
-    metadata.add_parameter(name='model', description='NeMo ASR model to use. Choices: fc_hybrid, '
-                                                     'parakeet, conformer, fc_ctc. '
-                                                     'By default, the fc_hybrid model will be used.',
+    metadata.add_parameter(name='model', 
+                           description='NeMo ASR model to use. Choices: fc_hybrid, parakeet, conformer, fc_ctc. By default, the fc_hybrid model will be used.',
                            type='string',
-                           choices=["fc_hybrid",
-                                    "parakeet", "conformer", "fc_ctc"],
+                           choices=["fc_hybrid", "parakeet", "conformer", "fc_ctc"],
                            default="fc_hybrid")
 
     return metadata
